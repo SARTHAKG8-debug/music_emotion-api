@@ -1,0 +1,17 @@
+__pycache__/
+*.pkl
+*.env
+.env
+venv/
+env/
+.pytest_cache/
+.vscode/
+
+# We ignore the heavy datasets too
+*.csv
+Data/
+MEMD_audio/
+MP3-Example/
+PMEmo2019/
+annotations/
+__MACOSX/
