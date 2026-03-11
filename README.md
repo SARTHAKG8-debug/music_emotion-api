@@ -56,3 +56,30 @@ Given a Spotify Track ID (e.g. `09ZQ5TmUG8TSL56n0knqrj`), the pipeline fetches l
 > export SPOTIPY_CLIENT_ID="your_client_id_here"
 > export SPOTIPY_CLIENT_SECRET="your_client_secret_here"
 > ```
+
+### 4. Run the Streamlit Frontend
+
+A Streamlit web application is provided for a more interactive, UI-driven experience rather than just raw API endpoints.
+
+To run the Streamlit frontend locally:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+This will open a browser window at `http://localhost:8501` where you can predict emotion by either pasting a Spotify track ID, or by manually adjusting music feature sliders.
+
+### 5. Deploying the Streamlit App
+
+The easiest way to make this app accessible on the internet is via [Streamlit Community Cloud](https://share.streamlit.io):
+
+1. **Push your code to GitHub**, making sure `streamlit_app.py`, `requirements.txt`, and the `api/` folder (with `.pkl` models) are included.
+2. Log into Streamlit Community Cloud and click **New app**.
+3. Select this repository and branch.
+4. Set the **Main file path** to `streamlit_app.py`.
+5. Before clicking "Deploy!", click **Advanced settings** and add your Spotify credentials in the **Secrets** section:
+   ```toml
+   SPOTIPY_CLIENT_ID="your_client_id_here"
+   SPOTIPY_CLIENT_SECRET="your_client_secret_here"
+   ```
+6. Click **Deploy!**
