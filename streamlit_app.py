@@ -103,6 +103,55 @@ def get_mood_html(prediction):
     </div>
     '''
 
+def display_playlist_generator(prediction, music_df, data_path):
+    st.divider()
+    st.markdown("### 🎧 Automatic Playlist Generator")
+    st.write(f"Based on the predicted mood (**{prediction}**), here are some matching tracks from our database:")
+    
+    with st.spinner("Curating your custom playlist..."):
+        if music_df is not None and not music_df.empty:
+            try:
+                import pandas as pd
+                full_df = pd.read_csv(data_path)
+                pred_lower = str(prediction).lower()
+                
+                if 'happy' in pred_lower or 'joy' in pred_lower:
+                    subset = full_df[(full_df['valence'] > 0.6) & (full_df['energy'] > 0.6)]
+                elif 'sad' in pred_lower or 'depress' in pred_lower:
+                    subset = full_df[(full_df['valence'] < 0.4) & (full_df['energy'] < 0.6) & (full_df['acousticness'] > 0.4)]
+                elif 'calm' in pred_lower or 'relax' in pred_lower:
+                    subset = full_df[(full_df['energy'] < 0.5) & (full_df['acousticness'] > 0.6)]
+                elif 'tense' in pred_lower or 'angry' in pred_lower:
+                    subset = full_df[(full_df['energy'] > 0.8) & (full_df['acousticness'] < 0.2)]
+                else:
+                    subset = full_df
+                    
+                if not subset.empty:
+                    sample_size = min(5, len(subset))
+                    playlist = subset.sample(n=sample_size)
+                    
+                    for _, track_row in playlist.iterrows():
+                        rec_name = track_row['name']
+                        rec_artist = track_row['artist']
+                        rec_id = track_row['spotify_id']
+                        
+                        st.markdown(f'''
+                        <div style="padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); margin-bottom: 10px;">
+                            <div style="font-weight: bold; font-size: 1.1rem;">{rec_name}</div>
+                            <div style="color: #a0a0a0;">by {rec_artist}</div>
+                            <a href="https://open.spotify.com/track/{rec_id}" target="_blank" style="text-decoration: none; color: #1DB954; font-weight: bold;">
+                                ▶ Listen on Spotify
+                            </a>
+                        </div>
+                        ''', unsafe_allow_html=True)
+                else:
+                    st.warning("Couldn't find enough matching tracks in the database for this specific mood.")
+            except Exception as e:
+                st.error(f"Error generating playlist: {e}")
+        else:
+            st.warning("Local dataset is not available to generate recommendations.")
+
+
 @st.cache_data
 def load_data():
     # Load the music dataset to use as a fallback for audio features
@@ -266,6 +315,9 @@ with tab1:
                                 
                             with st.expander("View Audio Features"):
                                 st.json({k: song_features[k] for k in FEATURE_NAMES})
+                            
+                            # Add playlist generator below track view
+                            display_playlist_generator(prediction, music_df, os.path.join(os.path.dirname(__file__), 'Music Info.csv'))
                                 
                 except Exception as e:
                     if "404" in str(e):
@@ -301,3 +353,6 @@ with tab2:
         X_scaled = scaler.transform(feature_values)
         prediction = model.predict(X_scaled)[0]
         st.markdown(get_mood_html(prediction), unsafe_allow_html=True)
+        
+        # Add playlist generator below manual prediction
+        display_playlist_generator(prediction, music_df, os.path.join(os.path.dirname(__file__), 'Music Info.csv'))

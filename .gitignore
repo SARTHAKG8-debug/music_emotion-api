@@ -15,3 +15,6 @@ MP3-Example/
 PMEmo2019/
 annotations/
 __MACOSX/
+
+# Streamlit
+.streamlit/secrets.toml
