@@ -5,3 +5,4 @@ scikit-learn
 spotipy
 pydantic
 streamlit
+joblib
