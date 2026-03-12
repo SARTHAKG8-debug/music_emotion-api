@@ -68,9 +68,13 @@ def load_models():
     scaler_path = os.path.join(os.path.dirname(__file__), 'api', 'scaler.pkl')
     
     if os.path.exists(model_path) and os.path.exists(scaler_path):
-        model = joblib.load(model_path)
-        scaler = joblib.load(scaler_path)
-        return model, scaler
+        try:
+            model = joblib.load(model_path)
+            scaler = joblib.load(scaler_path)
+            return model, scaler
+        except Exception as e:
+            st.error(f"🚨 **Error loading machine learning models:** `{e}`")
+            return None, None
     return None, None
 
 def get_mood_html(prediction):
