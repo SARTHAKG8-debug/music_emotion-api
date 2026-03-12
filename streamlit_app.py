@@ -4,6 +4,7 @@ import os
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import numpy as np
+from pathlib import Path
 
 # Feature mapping (same order as used in training) - defined early so load_data() can use it
 FEATURE_NAMES = ['danceability', 'loudness', 'speechiness', 'acousticness', 
@@ -155,7 +156,7 @@ def display_playlist_generator(prediction, music_df, data_path):
 @st.cache_data
 def load_data():
     # Load the music dataset to use as a fallback for audio features
-    data_path = os.path.join(os.path.dirname(__file__), 'Music Info.csv')
+    data_path = str(Path(__file__).parent / 'Music Info.csv')
     if os.path.exists(data_path):
         import pandas as pd
         df = pd.read_csv(data_path)
@@ -317,7 +318,7 @@ with tab1:
                                 st.json({k: song_features[k] for k in FEATURE_NAMES})
                             
                             # Add playlist generator below track view
-                            display_playlist_generator(prediction, music_df, os.path.join(os.path.dirname(__file__), 'Music Info.csv'))
+                            display_playlist_generator(prediction, music_df, str(Path(__file__).parent / 'Music Info.csv'))
                                 
                 except Exception as e:
                     if "404" in str(e):
@@ -355,4 +356,4 @@ with tab2:
         st.markdown(get_mood_html(prediction), unsafe_allow_html=True)
         
         # Add playlist generator below manual prediction
-        display_playlist_generator(prediction, music_df, os.path.join(os.path.dirname(__file__), 'Music Info.csv'))
+        display_playlist_generator(prediction, music_df, str(Path(__file__).parent / 'Music Info.csv'))
